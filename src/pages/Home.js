@@ -214,8 +214,15 @@ export default function SixColumnsGridWithSearchAndFilters() {
         width={screens.xs ? '100%' : 400}
       >
         <Button danger onClick={clearCart} style={{ marginBottom: 16 }}>Clear All</Button>
+        {/* หัวตาราง */}
+        <div style={{ display: 'flex', fontWeight: 'bold', marginBottom: 8 }}>
+          <div style={{ flex: 1 }}>Item</div>
+          <div style={{ flex: 1, textAlign: 'left' }}>Qty</div>
+          <div style={{ flex: 1, textAlign: 'right' }}>Price</div>
+        </div>
+
         {cart.length === 0 ? (
-          <p>ยังไม่มีสินค้าที่เลือก</p>
+          <p style={{textAlign:'center', marginTop:'20px'}}>No order</p>
         ) : (
           <>
             {cart.map((item) => {
@@ -223,13 +230,7 @@ export default function SixColumnsGridWithSearchAndFilters() {
               const total = price * item.quantity;
               return (
                 <div key={item.id} style={{ borderBottom: '1px solid #eee', paddingBottom: 12, marginBottom: 12 }}>
-                  {/* หัวตาราง */}
-                  <div style={{ display: 'flex', fontWeight: 'bold', marginBottom: 8 }}>
-                    <div style={{ flex: 1 }}>Item</div>
-                    <div style={{ flex: 1, textAlign: 'left' }}>Qty</div>
-                    <div style={{ flex: 1, textAlign: 'right' }}>Price</div>
-                  </div>
-
+                                 
                   {/* ข้อมูลสินค้า */}
                   <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
                     <div style={{ flex: 1, display: 'flex', alignItems: 'left' }}>
