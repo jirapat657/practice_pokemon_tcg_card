@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import '../App.css'; // สไตล์หลัก
 import axios from 'axios';
 import { Row, Col, Card, Select, Button, Space, Input, Pagination, Spin, message, Drawer, Grid, Divider, Badge } from 'antd';
@@ -161,12 +161,21 @@ export default function SixColumnsGridWithSearchAndFilters() {
   const [setWidth, setSetWidth] = useState(100);
   const [rarityWidth, setRarityWidth] = useState(100);
   const [typeWidth, setTypeWidth] = useState(100);
+  
+  //useMemo ใช้คำนวณ setOptions, rarityOptions, typeOptions แค่ตอน data เปลี่ยน
+  const setOptions = useMemo(() => {
+    return [...new Set(data.map(item => item.set?.name).filter(Boolean))];
+  }, [data]);
+  
+  const rarityOptions = useMemo(() => {
+    return [...new Set(data.map(item => item.rarity).filter(Boolean))];
+  }, [data]);
+  
+  const typeOptions = useMemo(() => {
+    return [...new Set(data.flatMap(item => item.types || []).filter(Boolean))];
+  }, [data]);
   //setความกว้างที่สุดของตัวนั้น
   useEffect(() => {
-    const setOptions = [...new Set(data.map((item) => item.set?.name || ''))];
-    const rarityOptions = [...new Set(data.map((item) => item.rarity || ''))];
-    const typeOptions = [...new Set(data.flatMap((item) => item.types || []))];
-
     setSetWidth(getMaxOptionWidth(setOptions));
     setRarityWidth(getMaxOptionWidth(rarityOptions));
     setTypeWidth(getMaxOptionWidth(typeOptions));
@@ -225,7 +234,7 @@ export default function SixColumnsGridWithSearchAndFilters() {
               value={setFilter}
               onChange={(value) => setSetFilter(value)}
             >
-              {[...new Set(data.map((item) => item.set?.name))].map((o) => (
+              {setOptions.map((o) => (
                 <Option key={o} value={o}>{o}</Option>
               ))}
             </Select>
@@ -237,7 +246,7 @@ export default function SixColumnsGridWithSearchAndFilters() {
               value={rarityFilter}
               onChange={(value) => setRarityFilter(value)}
             >
-              {[...new Set(data.map((item) => item.rarity))].map((o) => (
+              {rarityOptions.map((o) => (
                 <Option key={o} value={o}>{o}</Option>
               ))}
             </Select>
@@ -249,7 +258,7 @@ export default function SixColumnsGridWithSearchAndFilters() {
               value={typeFilter}
               onChange={(value) => setTypeFilter(value)}
             >
-              {[...new Set(data.flatMap((item) => item.types || []))].map((o) => (
+              {typeOptions.map((o) => (
                 <Option key={o} value={o}>{o}</Option>
               ))}
             </Select>
