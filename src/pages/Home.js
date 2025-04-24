@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../App.css'; // สไตล์หลัก
 import axios from 'axios';
-import { Row, Col, Card, Select, Button, Space, Input, Pagination, Spin, message, Drawer, Grid, Divider } from 'antd';
+import { Row, Col, Card, Select, Button, Space, Input, Pagination, Spin, message, Drawer, Grid, Divider, Badge } from 'antd';
 import { PlusOutlined, MinusOutlined, ShoppingCartOutlined, ShoppingOutlined} from '@ant-design/icons';
 
 const { Option } = Select;
@@ -26,7 +26,7 @@ export default function SixColumnsGridWithSearchAndFilters() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get('https://api.pokemontcg.io/v2/cards');
+        const res = await axios.get('https://api.pokemontcg.io/v2/cards'); //ใช้axiosในการดึง api
         console.log('API response:', res); // << แสดงทั้ง response
         console.log('Card data:', res.data.data); // << แสดงเฉพาะ array ข้อมูลการ์ด
         setData(res.data.data);
@@ -102,6 +102,41 @@ export default function SixColumnsGridWithSearchAndFilters() {
 
   const screens = useBreakpoint();
 
+  //animation add item to cart
+  const animateToCart = (e) => {
+    const cartBtn = document.querySelector('.cart-btn');
+    const cardImg = e.currentTarget.closest('.ant-card').querySelector('img');
+    if (!cartBtn || !cardImg) return;
+
+    const imgRect = cardImg.getBoundingClientRect();
+    const cartRect = cartBtn.getBoundingClientRect();
+
+    const flyImg = document.createElement('img');
+    flyImg.src = cardImg.src;
+    flyImg.style.position = 'fixed';
+    flyImg.style.left = `${imgRect.left}px`;
+    flyImg.style.top = `${imgRect.top}px`;
+    flyImg.style.width = `${imgRect.width}px`;
+    flyImg.style.height = `${imgRect.height}px`;
+    flyImg.style.transition = 'all 0.7s ease-in-out';
+    flyImg.style.zIndex = 9999;
+    flyImg.style.borderRadius = '10px';
+
+    document.body.appendChild(flyImg);
+
+    requestAnimationFrame(() => {
+      flyImg.style.left = `${cartRect.left + cartRect.width / 2 - imgRect.width / 4}px`;
+      flyImg.style.top = `${cartRect.top + cartRect.height / 2 - imgRect.height / 4}px`;
+      flyImg.style.width = '0px';
+      flyImg.style.height = '0px';
+      flyImg.style.opacity = 0;
+    });
+
+    setTimeout(() => {
+      document.body.removeChild(flyImg);
+    }, 700);
+  };
+
   return (
     <div className="App">
       {/* แถวบนสุด: ชื่อหน้าหลัก + Search */}
@@ -110,7 +145,20 @@ export default function SixColumnsGridWithSearchAndFilters() {
             <h1 style={{ margin: 0 }}>Pokemon Market</h1>      
         </Col>
         <Col xs={12} sm={{ span: 2, order: 3 }} style={{ textAlign: 'right' }}>
-          <Button type="primary" onClick={showDrawer}><ShoppingCartOutlined /> ({totalItems})</Button>
+        <Button
+          type="primary"
+          onClick={showDrawer}
+          className="cart-btn"
+          style={{ position: 'relative', padding: '0 12px' }}
+        >
+          <Badge
+            count={totalItems}
+            offset={[0, -2]}
+            style={{ backgroundColor: 'rgb(25, 118, 210)' }}
+          >
+            <ShoppingCartOutlined style={{ fontSize: '20px' }} />
+          </Badge>
+        </Button>
         </Col>
         <Col xs={24} sm={{ span: 10, order: 2 }}>
           <Input.Search
@@ -182,7 +230,15 @@ export default function SixColumnsGridWithSearchAndFilters() {
                 cover={<img src={item.images.small} alt={item.name} />}
                 title={item.name}
                 bordered
-                actions={[<Button style={{backgroundColor: 'rgb(255,255,255,0.5)'}}  onClick={() => handleAddToCart(item)}><ShoppingOutlined /> Add To Cart</Button>]}
+                actions={[<Button
+                  style={{ backgroundColor: 'rgb(255,255,255,0.5)' }}
+                  onClick={(e) => {
+                    animateToCart(e);
+                    handleAddToCart(item);
+                  }}
+                >
+                  <ShoppingOutlined /> Add To Cart
+                </Button>]}
               >
                 {/* <p>HP: {item.hp}</p> */}
                 <p>$ {item.cardmarket?.prices?.averageSellPrice}  • - Cards</p>
