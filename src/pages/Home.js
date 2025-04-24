@@ -52,6 +52,11 @@ export default function SixColumnsGridWithSearchAndFilters() {
   // คำนวณ slice สำหรับ pagination
   const paginatedData = filteredData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
+  //set current page to 1 when search or select
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchText, typeFilter, rarityFilter, setFilter]);  
+
   // ฟังก์ชันเปลี่ยนหน้า
   const handlePageChange = (page) => {
     setCurrentPage(page);
