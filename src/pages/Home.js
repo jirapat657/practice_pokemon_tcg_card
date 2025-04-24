@@ -87,10 +87,16 @@ export default function SixColumnsGridWithSearchAndFilters() {
   };
 
   //บอกจำนวนcardในตะกร้า
-  const updateQuantity = (id, delta) => {
-    setCart((prev) => prev.map((item) =>
-      item.id === id ? { ...item, quantity: Math.max(1, item.quantity + delta) } : item
-    ));
+  const updateQuantity = (productId, change) => {
+    setCart((prevItems) => {
+      return prevItems
+        .map((item) =>
+          item.id === productId
+            ? { ...item, quantity: item.quantity + change }
+            : item
+        )
+        .filter((item) => item.quantity > 0); // เอาออกเลยถ้าเหลือ 0
+    });
   };
 
   const clearCart = () => {
@@ -231,7 +237,7 @@ export default function SixColumnsGridWithSearchAndFilters() {
                 title={item.name}
                 bordered
                 actions={[<Button
-                  style={{ backgroundColor: 'rgb(255,255,255,0.5)' }}
+                  style={{ backgroundColor: 'rgb(255,255,255,0.08)' }}
                   onClick={(e) => {
                     animateToCart(e);
                     handleAddToCart(item);
@@ -304,19 +310,29 @@ export default function SixColumnsGridWithSearchAndFilters() {
                   {/* เพิ่มลดจำนวน */}
                   <div style={{ display: 'flex', alignItems: 'center', marginBottom: 8 }}>
                     <div style={{ flex: 1, textAlign: 'center' }}>
-                      <Button icon={<MinusOutlined />} onClick={() => updateQuantity(item.id, -1)} size="big" />
+                      <Button
+                        icon={<MinusOutlined />}
+                        onClick={() => updateQuantity(item.id, -1)}
+                        size="big"
+                        disabled={item.quantity <= 0} // ป้องกันติดลบ ถ้าไม่อยากให้ติดลบ
+                      />
                     </div>
                     <div style={{ flex: 1, textAlign: 'center' }}>
                       <span style={{ margin: '0 8px' }}>{item.quantity}</span>
                     </div>
                     <div style={{ flex: 1, textAlign: 'center' }}>
-                      <Button icon={<PlusOutlined />} onClick={() => updateQuantity(item.id, 1)} size="big" />
-                    </div>          
+                      <Button
+                        icon={<PlusOutlined />}
+                        onClick={() => updateQuantity(item.id, 1)}
+                        size="big"
+                      />
+                    </div>
                   </div>
+
                 </div>
               );
             })}
-            <Row gutter={[16,16]} align="middle" justify="space-between" style={{ marginBottom: 16 }}wrap>
+            <Row gutter={[16,16]} align="middle" justify="space-between" style={{ marginTop: 30 , marginBottom: 16 }}wrap>
               <p><strong>Total card amount: </strong></p>
               <p><strong>{totalItems}</strong></p>
             </Row>
