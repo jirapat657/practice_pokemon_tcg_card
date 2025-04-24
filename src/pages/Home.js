@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import '../App.css'; // สไตล์หลัก
 import axios from 'axios';
 import { Row, Col, Card, Select, Button, Space, Input, Pagination, Spin, message, Drawer, Grid, Divider, Badge } from 'antd';
@@ -143,6 +143,35 @@ export default function SixColumnsGridWithSearchAndFilters() {
     }, 700);
   };
 
+  //หาความกว้างที่สุดของตัวอักษรในoption
+  const getMaxOptionWidth = (options) => {
+    const canvas = document.createElement('canvas');
+    const context = canvas.getContext('2d');
+    context.font = '14px "Roboto", "Helvetica Neue", Arial'; // ฟอนต์ที่ใช้กับ Select
+  
+    let maxWidth = 0;
+    options.forEach(option => {
+      const width = context.measureText(option).width;
+      if (width > maxWidth) maxWidth = width;
+    });
+  
+    return maxWidth + 60; // เพิ่ม padding สำหรับ dropdown
+  };
+  //ความกว้างช่องเริ่มต้น100
+  const [setWidth, setSetWidth] = useState(100);
+  const [rarityWidth, setRarityWidth] = useState(100);
+  const [typeWidth, setTypeWidth] = useState(100);
+  //setความกว้างที่สุดของตัวนั้น
+  useEffect(() => {
+    const setOptions = [...new Set(data.map((item) => item.set?.name || ''))];
+    const rarityOptions = [...new Set(data.map((item) => item.rarity || ''))];
+    const typeOptions = [...new Set(data.flatMap((item) => item.types || []))];
+
+    setSetWidth(getMaxOptionWidth(setOptions));
+    setRarityWidth(getMaxOptionWidth(rarityOptions));
+    setTypeWidth(getMaxOptionWidth(typeOptions));
+  }, [data]);
+
   return (
     <div className="App">
       {/* แถวบนสุด: ชื่อหน้าหลัก + Search */}
@@ -190,7 +219,8 @@ export default function SixColumnsGridWithSearchAndFilters() {
           <Space>
             <Select
               placeholder="Set"
-              style={{ width: 100 }}
+              style={{ minWidth: 100, width: 'auto' }}
+              dropdownStyle={{ width: setWidth }}
               allowClear
               value={setFilter}
               onChange={(value) => setSetFilter(value)}
@@ -201,7 +231,8 @@ export default function SixColumnsGridWithSearchAndFilters() {
             </Select>
             <Select
               placeholder="Rarity"
-              style={{ width: 100 }}
+              style={{ minWidth: 100, width: 'auto' }}
+              dropdownStyle={{ width: rarityWidth }}
               allowClear
               value={rarityFilter}
               onChange={(value) => setRarityFilter(value)}
@@ -212,7 +243,8 @@ export default function SixColumnsGridWithSearchAndFilters() {
             </Select>
             <Select
               placeholder="Type"
-              style={{ width: 100 }}
+              style={{ minWidth: 100, width: 'auto' }}
+              dropdownStyle={{ width: typeWidth }}
               allowClear
               value={typeFilter}
               onChange={(value) => setTypeFilter(value)}
