@@ -116,7 +116,7 @@ export default function SixColumnsGridWithSearchAndFilters() {
   //animation add item to cart
   const animateToCart = (e) => {
     const cartBtn = document.querySelector('.cart-btn');
-    const cardImg = e.currentTarget.closest('.ant-card').querySelector('img');
+    const cardImg = e.currentTarget.closest('[data-card-id]').querySelector('.card-img');
     if (!cartBtn || !cardImg) return;
 
     const imgRect = cardImg.getBoundingClientRect();
@@ -222,7 +222,7 @@ export default function SixColumnsGridWithSearchAndFilters() {
       <Divider />
 
       {/* แถวตัวกรอง */}
-      <Row gutter={[16,16]} align="middle" justify="space-between" style={{ marginBottom: 16 }}wrap>
+      <Row gutter={[16,16]} align="middle" justify="space-between" style={{ marginBottom: 30 }}wrap>
         <Col xs={12} lg={{ span: 14, order: 1 }}>
           <h2>Choose Card</h2>
         </Col>
@@ -278,25 +278,48 @@ export default function SixColumnsGridWithSearchAndFilters() {
         <Row gutter={[16, 16]}>
           {paginatedData.map((item) => (
             <Col key={item.id} span={4} xs={24} sm={12} md={8} lg={4}>
+            <div data-card-id={item.id} style={{ position: 'relative', marginTop: 140 }}> {/* ระยะเผื่อให้รูปลอย */}
+              {/* รูปการ์ดลอยออกนอกกรอบ */}
+              <img
+                className="card-img"
+                src={item.images.small}
+                alt={item.name}
+                style={{
+                  position: 'absolute',
+                  top: '-140px', // ยกขึ้นให้เลยกรอบ Card
+                  left: '50%',
+                  transform: 'translateX(-50%)',
+                  width: '120px',
+                  zIndex: 2,
+                }}
+              />
+              {/* ตัว Card */}
               <Card
-                cover={<img src={item.images.small} alt={item.name} />}
-                title={item.name}
                 bordered
-                actions={[<Button
-                  style={{ backgroundColor: 'rgb(255,255,255,0.08)' }}
-                  onClick={(e) => {
-                    animateToCart(e);
-                    handleAddToCart(item);
-                  }}
-                >
-                  <ShoppingOutlined /> Add To Cart
-                </Button>]}
+                style={{ paddingTop: 40, textAlign:'center' }}
+                
               >
-                {/* <p>HP: {item.hp}</p> */}
-                <p>$ {item.cardmarket?.prices?.averageSellPrice}  • - Cards</p>
-                {/* <p>Type: {item.types && item.types.join(', ')}</p> */}
+                <h3 style={{
+                  display: '-webkit-box',
+                  WebkitBoxOrient: 'vertical',
+                  WebkitLineClamp: 2, // จำกัดแค่ 2 บรรทัด
+                  overflow: 'hidden',
+                  textAlign: 'center',
+                  minHeight: '3em', // ให้ความสูงคงที่โดยประมาณ
+                }}>{item.name}</h3>
+                <p style={{color:'rgb(255,255,255,0.5)'}}>$ {item.cardmarket?.prices?.averageSellPrice} • - Cards</p>
+                <Button
+                    style={{ backgroundColor: 'rgb(255,255,255,0.08)' }}
+                    onClick={(e) => {
+                      animateToCart(e);
+                      handleAddToCart(item);
+                    }}
+                  >
+                    <ShoppingOutlined /> Add To Cart
+                  </Button>
               </Card>
-            </Col>
+            </div>
+          </Col>
           ))}
         </Row>
       )}
